@@ -1,0 +1,77 @@
+- hosts: all
+  
+  vars_prompt:
+     
+     - name: mount_dir_name
+       private: no
+       prompt: "Give the mount dir Name like ->/mount !"
+     
+     - name: yum_desc
+       private: no
+       prompt: "Give the Description for your repo !!"  
+       
+     - name: port_no
+       private: no
+       prompt: "What the new port no you want to give for your server ?"
+
+     - name: conf_filename
+       private: no
+       prompt: "Give A best name for your conf file !!(new)"  
+     
+     - name: web_content
+       private: no
+       prompt: "Give the Body for your WebSite !!"
+
+     - name: conf_fold
+       private: no
+       prompt: "Give the name for the conf folder !!"
+     
+  tasks:
+
+  - file:
+     state: directory
+     path: "{{mount_dir_name}}"
+
+  - mount:
+     src: "/dev/cdrom"
+     path: "{{mount_dir_name}}"
+     state: mounted
+     fstype: "iso9660"
+
+  - yum_repository:
+     baseurl: "{{mount_dir_name}}/AppStream"
+     name: "RepO1"
+     description: "{{yum_desc}}"
+     gpgcheck: no
+
+  - yum_repository:
+     baseurl: "{{mount_dir_name}}/BaseOS"
+     name: "RepO2"
+     description: "{{yum_desc}}"
+     gpgcheck: no
+  
+  - package:
+     name: "httpd"
+     state: present
+  
+  - file:
+     state: directory
+     path: "/var/www/{{conf_fold}}"
+
+  - template:
+     dest: "/etc/httpd/conf.d/{{conf_filename}}.conf"
+     src: "{{conf_filename}}.conf"   
+  
+  - copy:
+     dest: "/var/www/{{conf_fold}}/index.html"
+     content: "{{web_content}}"   
+
+  - service:
+     name: "httpd"
+     state: restarted
+     enabled: yes
+  
+  - firewalld:
+     port: "{{port_no}}"
+     state: enabled
+     immediate: yes
