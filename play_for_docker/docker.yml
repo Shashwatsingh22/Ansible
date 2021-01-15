@@ -1,0 +1,23 @@
+- hosts: docker
+
+  tasks:
+  
+  - name: "Creating  An yum repo for docker..... "
+    yum_repository:
+            name: "docker"
+            description: "repo for DOcker"
+            baseurl: "https://download.docker.com/linux/centos/7/x86_64/stable/"
+            gpgcheck: no
+ 
+  - name: "CHeck docker is present or not ?"
+    command: "rpm -q docker-ce"
+    register: dock
+    ignore_errors: yes
+
+  - name: "Instalation of Docker..."
+    shell: "yum install docker-ce --nobest -y"
+ 
+  - service:
+          name: "docker"
+          state: started
+          
