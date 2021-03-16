@@ -1,8 +1,5 @@
 - hosts: docker
 
-  tasks:[root@localhost play_for_docker]# vim docker1.yml
-- hosts: docker
-
   tasks:
 
   - name: "Creating  An yum repo for docker..... "
